@@ -5,39 +5,81 @@ import processing.core.PImage;
 // import processing.sound.SoundFile;
 
 public class App extends PApplet{
-        PImage brickwallImage;
         int scene = 1;
-        Platform platform1 = new Platform(0,570,900, this);
-        Platform platform2 = new Platform(0,490,700, this);
-        Platform platform3 = new Platform(100,410,700, this);
-
+        // String letter = random("a","b"); //random letter of the alphabet 
+        Tile tile = new Tile(200,600, "a", this);
+        int text = 1;
+        ArrayList<Tile> list = new ArrayList<>();
+        int numberOfTiles = 16;
 
 
     public static void main(String[] args)  {
         PApplet.main("App");
-
+        
     }
 
-    public void setup(){
-        // brickwallImage = loadImage("brickwall.jpg");
 
+    public void setup(){
+        // room = loadImage("room.png");
 
     }
 
     public void settings(){
-        size(800,600);
+        size(1200,800);
     }
 
     public void draw(){
-        // image(brickwallImage, 100, 500, 100,100); //Image of wall
-        if (scene==1){
-            
-            platform1.makePlatform();
-            platform2.makePlatform();
-            platform3.makePlatform();
+        background(0,70,50); //dark green
+
+        // for(int i=0; i<16; i++){
+            tile.makeTile();
+            list.add(tile);
+        // }
+
+
+    if (scene==1){
+
+            if(text==1){
+                fill(255);
+                textSize(50);
+                text("Welcome!", 300,120,300,80);
+            } else if(text==2){
+                textSize(30);
+                fill(255);
+                text("Play games to gain sleep, food, and water.", 150,120,600,80);
+            } else if(text==3){
+                fill(255);
+                textSize(50);
+                text("Lets get started!", 240,120,400,80);
+            }
+
+
+        // image(bed,-50,250,300,470);
+
+
+
+    } else if (scene==2){
+        background(0,100,50);
+    }
+
+    }
+    public void keyPressed(){
+        if(key == ' '){
+            text++;
         }
+    }
 
+    public void mousePressed(){
+        int posX = tile.returnPositionX();
+        int posY = tile.returnPositionY();
+        if(mousePressed){
+        for(Tile tile:list){
+            tile.checkInside(mouseX, mouseY);
+        }
+        }
+    }
 
+    public void mouseReleased(){
 
     }
 
