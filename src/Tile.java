@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Random;
 
 import processing.core.PApplet;
 
@@ -9,22 +10,24 @@ public class Tile {
     private PApplet canvas;
     private boolean dragging = false;
     private float offsetX, offsetY;
-    ArrayList<Tile> list = new ArrayList<>();
     private boolean checkConnection;
     private int tileBorderR;
     private int tileBorderG;
     private int tileBorderB;
+    private int selected;
+    private boolean canDump;
 
-
-    public Tile(float x, float y, String l, PApplet c){
+    public Tile(float x, float y, PApplet c){
     posX = x;
     posY = y;
-    letter = l;
     canvas = c;
     checkConnection = false;
     tileBorderR = 255;
     tileBorderG = 255;
     tileBorderB = 255;
+    randomLetter();
+    selected = 1;
+    canDump = false;
 
     }
 
@@ -43,7 +46,7 @@ public class Tile {
 
     public float setPositionY(float changeY){
         posY = changeY;
-        return posX;
+        return posY;
 
     }
 
@@ -52,6 +55,14 @@ public class Tile {
             dragging=true;
             offsetX = canvas.mouseX - posX;
             offsetY = canvas.mouseY - posY;
+            selected++;
+            if(selected%2==0){
+                changeColor(255,0,0);
+                canDump=true;
+            } else if(selected%2==1){
+                changeColor(255, 255, 255);
+                canDump=false;
+            }
         }
     }
 
@@ -70,50 +81,77 @@ public class Tile {
         checkConnection = true;
     }
 
-    public void checkDistance(){        
+    public void checkDistance(ArrayList<Tile> list){        
         if(checkConnection == true){
         for(Tile tileMoving:list){ 
             for(Tile tile2:list){
-                float DistanceX = Math.abs(tileMoving.returnPositionX()-tile2.returnPositionX()+50);
-                float DistanceY = Math.abs(tileMoving.returnPositionY()-tile2.returnPositionY()+50);
+                if(tileMoving == tile2){
+                    continue;
+                }
+
+                float DistanceX = Math.abs((tileMoving.returnPositionX()+50)-tile2.returnPositionX());
+                float DistanceY = Math.abs((tileMoving.returnPositionY()+50)-tile2.returnPositionY());
                 if(DistanceX<10){
-                    tileMoving.setPositionX(tileMoving.returnPositionX()+DistanceX);
+                    tileMoving.setPositionX(tileMoving.returnPositionX()-DistanceX);
                     tileMoving.setPositionY(tile2.returnPositionY());
-                    changeR(0);
-                    changeG(200);
-                    changeB(0);
+                    tileMoving.changeColor(0,200,0);
 
                 } else if(DistanceY<10){
-                    tileMoving.setPositionY(tileMoving.returnPositionY()+DistanceY);
+                    tileMoving.setPositionY(tileMoving.returnPositionY()-DistanceY);
                     tileMoving.setPositionX(tile2.returnPositionX());
-                    changeR(0);
-                    changeG(200);
-                    changeB(0);
+                    tileMoving.changeColor(0,200,0);
+
                 }
             }
         }
     }
     }
 
-    public void changeR(int r){
-        tileBorderR=r;
+    public void changeColor(int r, int g, int b){
+    tileBorderR = r;
+    tileBorderG = g;
+    tileBorderB = b;
+
     }
-    public void changeG(int g){
-        tileBorderG=g;
-    }
-    public void changeB(int b){
-        tileBorderB=b;
+    public int getColor(){
+        return canvas.color(tileBorderR,tileBorderG,tileBorderB);
     }
 
-    public int getR(){
-        return tileBorderR;
+    public char randomLetter(){
+        //ChatGPT
+        Random rand = new Random();
+        char capital = (char) ('A' + rand.nextInt(26)); 
+        letter = String.valueOf(capital);
+        return capital;
+
     }
-    public int getG(){
-        return tileBorderG;
-    }
-    public int getB(){
-        return tileBorderB;
+    
+    public String getLetter(){
+        return letter;
     }
 
+    public void dump(){
+        if(canDump==true){
+        Random rand = new Random();
+        char capital = (char) ('A' + rand.nextInt(26)); 
+        letter = String.valueOf(capital);
+        }
+    }
+    int smallestX = 2000;
+    int smallestY = 2000;
+    public void checkDistance2(){
+        if(checkConnection){
+        for (int row = 0; row < 16; row++) {
+            for (int col = 0; col < 16; col++) {
+                if(Math.abs(posX-row*50)<smallestX){
+                    smallestX=row*50;
+                }
+                if(Math.abs(posY-col*50)<smallestY){
+                    smallestY=col*50;
+                }
+            }
+        }
+        }
+    }
 
 }
