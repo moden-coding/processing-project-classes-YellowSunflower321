@@ -7,8 +7,9 @@ import java.io.PrintWriter; //for saving names to data file
 // import processing.sound.SoundFile;
 
 //change probability of getting each letter (i.e higher probability for e)
-//add grid
 //add instructions and high score page
+//make sure two tiles can't be in the same box
+//fix saving name to data
 
 public class App extends PApplet {
     int scene = 1;
@@ -26,8 +27,12 @@ public class App extends PApplet {
     String typedText = "";
     ArrayList<String> names = new ArrayList<>();
     int lineMoves = 0;
-
-    Tile[][] grid = new Tile[16][16];
+    boolean showText = true;
+    Tile[][] grid = new Tile[24][16];
+    ArrayList<Word> wordsInRow = new ArrayList<>();
+    String word = "";
+    int skipTiles=0;
+    int letterCount=1;
 
     public static void main(String[] args) {
         PApplet.main("App");
@@ -56,18 +61,13 @@ public class App extends PApplet {
 
     public void draw() {
 
+        //Draws grid
         for (int row = 0; row < grid.length; row++) {
             for (int col = 0; col < grid.length; col++) {
                 strokeWeight(2);
                 stroke(20, 90, 70);
                 fill(0, 70, 50); // dark green
-                rect(row * 50, col * 50, 50, 50);
-                // if(squareIsEmpty()){
-                // continue;
-                // } else if(){
-
-                // }
-                System.out.println(grid[row][col]);
+                rect(row * 50.0f, col * 50.0f, 50.0f, 50.0f);
 
             }
         }
@@ -89,8 +89,11 @@ public class App extends PApplet {
             fill(0);
             text(typedText, 410, 350, 500, 500);
             saveName(typedText); // adds typed text to data file
+    
+            
 
         } else if (scene == 2) {
+            
             // grid for background
             // for (int r=0; r < gridRows; r++) {
             // for (int c=0; c < gridColumns; c++) {
@@ -124,11 +127,10 @@ public class App extends PApplet {
                 textSize(30);
                 fill(101, 67, 33);
                 text(t.getLetter(), t.returnPositionX() + 15, t.returnPositionY() + 5, 100, 100);
-                t.checkDistance2();
-                // t.checkDistance2(list);
             }
 
-            if (text == 1) {
+
+            if (text == 1 && showText==true) {
                 fill(255);
                 textSize(50);
                 text("Welcome to Banananograms " + typedText + "!", 250, 300, 1200, 80);
@@ -156,9 +158,6 @@ public class App extends PApplet {
             }
         }
 
-        if(key == 's'){
-            System.out.println();
-        }
         // ChatGPT
         if (scene == 1) {
             // BACKSPACE deletes a character
@@ -176,6 +175,7 @@ public class App extends PApplet {
     }
 
     public void mousePressed() {
+        showText=false;
         for (Tile s : list) {
             s.mousePressed();
         }
@@ -184,14 +184,16 @@ public class App extends PApplet {
     public void mouseDragged() {
         for (Tile s : list) {
             s.mouseDragged();
+            }
         }
 
-    }
 
     public void mouseReleased() {
         for (Tile s : list) {
             s.mouseReleased();
         }
+        checkRows();
+
     }
 
     public void saveName(String name) {
@@ -200,4 +202,48 @@ public class App extends PApplet {
 
     }
 
-}
+    
+
+    public void checkRows(){
+        for(int row = 0; row < 24; row++){
+            for(int col = 0; col<16; col=col+letterCount){
+                //get letter of tile with posX and posY at that point;
+            for(Tile t:list){
+                if(t.tilePresent(row,col)){    
+                    word = word + String.valueOf(t.getLetter());
+                    for(int i=0; i<(16-col); i++){
+                    for(Tile s:list){
+                        if(s.tilePresent(row,col+letterCount)){
+                            word = word + String.valueOf(s.getLetter());
+                            System.out.println(word);
+                            letterCount++;
+                        } else if(letterCount>1){
+                            Word w = new Word(word);
+                            wordsInRow.add(w);
+                            System.out.println(word);
+                            word = "";
+                        } else if(letterCount==1){
+                            word = "";
+                            letterCount++;
+                        }
+                        }
+                    }
+                }
+                
+            }
+                
+            }
+            }
+            
+                    
+                }
+            
+        
+            }
+    
+        
+
+    
+    
+
+
